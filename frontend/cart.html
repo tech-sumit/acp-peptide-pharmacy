@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Checkout | ACP Peptide Pharmacy</title>
+		<meta
+			name="description"
+			content="Run the ACP demo checkout flow from the storefront: cart, address capture, fulfillment, and order completion."
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="./css/styles.css" />
+		<script src="./js/config.js" defer></script>
+		<script src="./js/app.js" defer></script>
+	</head>
+	<body data-page="cart">
+		<div class="page-shell">
+			<header class="site-header">
+				<a class="brandmark" href="./index.html">
+					<span class="brandmark__eyebrow">Research Ordering Demo</span>
+					<span class="brandmark__title">ACP Peptide Pharmacy</span>
+				</a>
+				<nav class="site-nav">
+					<a href="./index.html#catalog">Catalog</a>
+					<a href="./cart.html" class="nav-cart nav-cart--active"
+						>Cart <span data-cart-count>0</span></a
+					>
+				</nav>
+			</header>
+
+			<main class="checkout-page">
+				<section class="checkout-header">
+					<div>
+						<div class="section-kicker">ACP checkout walkthrough</div>
+						<h1>From storefront cart to demo order</h1>
+					</div>
+					<p>
+						This checkout uses the same backend state that the MCP tools use.
+						No real payment is processed.
+					</p>
+				</section>
+
+				<section class="checkout-layout">
+					<div class="checkout-column">
+						<div class="panel panel--glass">
+							<div class="panel__header">
+								<h2>Cart items</h2>
+								<button class="button button--ghost" data-clear-cart>
+									Clear cart
+								</button>
+							</div>
+							<div data-cart-items></div>
+						</div>
+
+						<div class="panel panel--glass">
+							<div class="panel__header">
+								<h2>Buyer and fulfillment</h2>
+								<span class="eyebrow-chip">Required before payment</span>
+							</div>
+							<form class="checkout-form" data-checkout-form>
+								<div class="form-grid">
+									<label>
+										<span>First name</span>
+										<input name="first_name" required />
+									</label>
+									<label>
+										<span>Last name</span>
+										<input name="last_name" required />
+									</label>
+									<label>
+										<span>Email</span>
+										<input name="email" type="email" required />
+									</label>
+									<label>
+										<span>Phone</span>
+										<input name="phone_number" type="tel" />
+									</label>
+									<label class="form-grid__full">
+										<span>Recipient / lab name</span>
+										<input name="name" required />
+									</label>
+									<label class="form-grid__full">
+										<span>Address line 1</span>
+										<input name="line_one" required />
+									</label>
+									<label class="form-grid__full">
+										<span>Address line 2</span>
+										<input name="line_two" />
+									</label>
+									<label>
+										<span>City</span>
+										<input name="city" required />
+									</label>
+									<label>
+										<span>State</span>
+										<input name="state" required />
+									</label>
+									<label>
+										<span>Postal code</span>
+										<input name="postal_code" required />
+									</label>
+									<label>
+										<span>Country</span>
+										<input name="country" value="US" maxlength="2" required />
+									</label>
+								</div>
+							</form>
+							<div class="shipping-options" data-shipping-options></div>
+						</div>
+					</div>
+
+					<aside class="checkout-column checkout-column--sidebar">
+						<div class="panel panel--solid">
+							<div class="panel__header">
+								<h2>Checkout controls</h2>
+								<span class="eyebrow-chip">Demo payment mode</span>
+							</div>
+							<div class="action-stack">
+								<button class="button button--primary" data-sync-checkout>
+									Create / update ACP session
+								</button>
+								<button class="button button--secondary" data-complete-order>
+									Complete demo order
+								</button>
+								<button class="button button--ghost" data-cancel-checkout>
+									Cancel checkout
+								</button>
+							</div>
+							<div class="status-panel" data-checkout-status>
+								<p>Your checkout session details will appear here.</p>
+							</div>
+						</div>
+					</aside>
+				</section>
+			</main>
+		</div>
+	</body>
+</html>

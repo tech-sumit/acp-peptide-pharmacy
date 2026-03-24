@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "acp-peptide-pharmacy": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://acp-peptide-pharmacy-backend.tech-sumit.workers.dev/mcp"
+      ]
+    }
+  }
+}

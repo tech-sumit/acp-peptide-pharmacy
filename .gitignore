@@ -1,0 +1,14 @@
+.DS_Store
+.wrangler/
+node_modules/
+dist/
+coverage/
+*.log
+
+# Local environment files
+.dev.vars
+.env
+.env.*
+
+# Build output
+frontend/dist/

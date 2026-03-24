@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>ACP Peptide Pharmacy</title>
+		<meta
+			name="description"
+			content="A clinical-luxury peptide storefront demonstrating ACP checkout and MCP ordering for AI agents."
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="./css/styles.css" />
+		<script src="./js/config.js" defer></script>
+		<script src="./js/app.js" defer></script>
+	</head>
+	<body data-page="home">
+		<div class="page-shell">
+			<header class="site-header">
+				<a class="brandmark" href="./index.html">
+					<span class="brandmark__eyebrow">Research Ordering Demo</span>
+					<span class="brandmark__title">ACP Peptide Pharmacy</span>
+				</a>
+				<nav class="site-nav">
+					<a href="#catalog">Catalog</a>
+					<a href="#protocol-stack">Protocol Stack</a>
+					<a href="./cart.html" class="nav-cart"
+						>Cart <span data-cart-count>0</span></a
+					>
+				</nav>
+			</header>
+
+			<main>
+				<section class="hero">
+					<div class="hero__content">
+						<div class="section-kicker">Clinical-Luxury Storefront</div>
+						<h1>
+							Agentic commerce for
+							<span>research peptides</span>
+						</h1>
+						<p class="hero__lede">
+							A polished demo storefront showing how ACP checkout sessions and
+							MCP tools can power the same ordering flow for people and AI
+							agents.
+						</p>
+						<div class="hero__actions">
+							<a class="button button--primary" href="#catalog"
+								>Browse catalog</a
+							>
+							<a class="button button--ghost" href="./cart.html"
+								>Open live checkout</a
+							>
+						</div>
+						<ul class="hero__chips">
+							<li>Cloudflare Workers backend</li>
+							<li>GitHub Pages frontend</li>
+							<li>MCP tools for Claude and Cursor</li>
+						</ul>
+					</div>
+					<div class="hero__panel assay-panel">
+						<div class="assay-panel__header">
+							<span class="section-kicker">Active stack</span>
+							<span class="assay-panel__status">Demo environment</span>
+						</div>
+						<div class="assay-metrics">
+							<article>
+								<h2>ACP</h2>
+								<p>Structured cart, fulfillment, and payment lifecycle.</p>
+							</article>
+							<article>
+								<h2>MCP</h2>
+								<p>Agent-facing tools mapped to the same commerce backend.</p>
+							</article>
+							<article>
+								<h2>Research only</h2>
+								<p>Every product is clearly labeled for demo compliance.</p>
+							</article>
+						</div>
+						<div class="assay-panel__footer">
+							<p>Use the same backend from the web UI or through AI clients.</p>
+						</div>
+					</div>
+				</section>
+
+				<section class="catalog-section" id="catalog">
+					<div class="section-header">
+						<div>
+							<div class="section-kicker">Peptide catalog</div>
+							<h2>Protocol-ready inventory</h2>
+						</div>
+						<p>
+							Filter by research track, inspect a product, then push it through
+							the ACP checkout flow.
+						</p>
+					</div>
+					<div class="filter-strip" data-category-filters></div>
+					<div class="product-grid" data-product-grid></div>
+				</section>
+
+				<section class="protocol-stack" id="protocol-stack">
+					<div class="section-header">
+						<div>
+							<div class="section-kicker">Protocol stack</div>
+							<h2>Human UI and agent tooling share one backend</h2>
+						</div>
+						<p>
+							The same catalog and checkout state are available to browsers,
+							Claude Desktop, Cursor, and any MCP-compatible client.
+						</p>
+					</div>
+					<div class="stack-grid">
+						<article class="stack-card">
+							<h3>1. Product discovery</h3>
+							<p>
+								The storefront and MCP tools call the same product catalog API
+								for pricing, purity, and inventory.
+							</p>
+						</article>
+						<article class="stack-card">
+							<h3>2. ACP checkout</h3>
+							<p>
+								Checkout sessions store cart state, shipping, totals, and demo
+								payment completion in Cloudflare Durable Objects.
+							</p>
+						</article>
+						<article class="stack-card">
+							<h3>3. Agent ordering</h3>
+							<p>
+								MCP tools wrap the same backend so an assistant can browse,
+								create, update, and complete peptide orders.
+							</p>
+						</article>
+					</div>
+				</section>
+			</main>
+		</div>
+	</body>
+</html>
