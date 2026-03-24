@@ -5,6 +5,13 @@ const jsonHeaders = {
 	'content-type': 'application/json',
 }
 
+function requestHeadersForIp(ip: string): Headers {
+	return new Headers({
+		...jsonHeaders,
+		'cf-connecting-ip': ip,
+	})
+}
+
 const address = {
 	name: 'Dr. Maya Patel',
 	line_one: '123 Lab Lane',
@@ -180,6 +187,73 @@ describe('ACP peptide pharmacy API', () => {
 		expect(completed.order.permalink_url).toContain('/orders/')
 	})
 
+	it('retrieves an order by ID via GET /orders/:id after checkout completion', async () => {
+		const createResponse = await SELF.fetch(
+			new Request('http://example.com/checkout_sessions', {
+				method: 'POST',
+				headers: jsonHeaders,
+				body: JSON.stringify({
+					items: [{ id: 'bpc-157', quantity: 1 }],
+					buyer,
+					fulfillment_address: address,
+				}),
+			}),
+		)
+		const created = (await createResponse.json()) as { id: string }
+
+		const completeResponse = await SELF.fetch(
+			new Request(
+				`http://example.com/checkout_sessions/${created.id}/complete`,
+				{
+					method: 'POST',
+					headers: jsonHeaders,
+					body: JSON.stringify({
+						buyer,
+						payment_data: {
+							provider: 'stripe',
+							token: 'spt_demo_token',
+							billing_address: address,
+						},
+					}),
+				},
+			),
+		)
+		const completed = (await completeResponse.json()) as {
+			order: { id: string; permalink_url: string }
+		}
+
+		const orderResponse = await SELF.fetch(
+			new Request(`http://example.com/orders/${completed.order.id}`),
+		)
+
+		expect(orderResponse.status).toBe(200)
+
+		const order = (await orderResponse.json()) as {
+			id: string
+			data: string
+			checkout_session_id: string
+			status: string
+			permalink_url: string
+		}
+
+		expect(order.id).toBe(completed.order.id)
+		expect(order.data).toBe('order')
+		expect(order.checkout_session_id).toBe(created.id)
+		expect(order.status).toBe('created')
+		expect(order.permalink_url).toContain('/orders/')
+	})
+
+	it('returns 404 for a non-existent order ID', async () => {
+		const response = await SELF.fetch(
+			new Request('http://example.com/orders/order_nonexistent'),
+		)
+
+		expect(response.status).toBe(404)
+
+		const body = (await response.json()) as { code: string }
+		expect(body.code).toBe('not_found')
+	})
+
 	it('cancels an active checkout session', async () => {
 		const createResponse = await SELF.fetch(
 			new Request('http://example.com/checkout_sessions', {
@@ -202,5 +276,57 @@ describe('ACP peptide pharmacy API', () => {
 
 		const canceled = (await cancelResponse.json()) as { status: string }
 		expect(canceled.status).toBe('canceled')
+	})
+
+	it('rate limits repeated catalog reads from the same IP address', async () => {
+		const ip = '198.51.100.10'
+		let finalResponse: Response | undefined
+
+		for (let attempt = 0; attempt < 61; attempt += 1) {
+			finalResponse = await SELF.fetch(
+				new Request('http://example.com/products', {
+					headers: requestHeadersForIp(ip),
+				}),
+			)
+		}
+
+		expect(finalResponse?.status).toBe(429)
+		expect(finalResponse?.headers.get('x-rate-limit-limit')).toBe('60')
+		expect(finalResponse?.headers.get('retry-after')).toBeTruthy()
+
+		const body = (await finalResponse?.json()) as {
+			code: string
+			message: string
+		}
+		expect(body.code).toBe('rate_limited')
+		expect(body.message).toContain('Too many requests')
+	})
+
+	it('rate limits repeated checkout writes from the same IP address', async () => {
+		const ip = '198.51.100.11'
+		let finalResponse: Response | undefined
+
+		for (let attempt = 0; attempt < 16; attempt += 1) {
+			finalResponse = await SELF.fetch(
+				new Request('http://example.com/checkout_sessions', {
+					method: 'POST',
+					headers: requestHeadersForIp(ip),
+					body: JSON.stringify({
+						items: [{ id: 'bpc-157', quantity: 1 }],
+					}),
+				}),
+			)
+		}
+
+		expect(finalResponse?.status).toBe(429)
+		expect(finalResponse?.headers.get('x-rate-limit-limit')).toBe('15')
+		expect(finalResponse?.headers.get('retry-after')).toBeTruthy()
+
+		const body = (await finalResponse?.json()) as {
+			code: string
+			message: string
+		}
+		expect(body.code).toBe('rate_limited')
+		expect(body.message).toContain('Too many requests')
 	})
 })

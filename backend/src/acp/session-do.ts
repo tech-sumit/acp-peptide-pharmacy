@@ -15,6 +15,12 @@ import type {
 } from './types'
 
 const SESSION_STORAGE_KEY = 'checkout-session'
+const ORDER_REF_STORAGE_KEY = 'order-ref'
+
+interface OrderReference {
+	orderId: string
+	sessionId: string
+}
 
 export class CheckoutSessionDurableObject extends DurableObject<Env> {
 	async createSession(
@@ -69,6 +75,17 @@ export class CheckoutSessionDurableObject extends DurableObject<Env> {
 
 		const completedRecord = completeCheckoutRecord(record, input)
 		await this.saveRecord(completedRecord)
+
+		if (completedRecord.order) {
+			const refStub = this.env.CHECKOUT_SESSIONS.getByName(
+				completedRecord.order.id,
+			)
+			await refStub.storeOrderReference({
+				orderId: completedRecord.order.id,
+				sessionId: completedRecord.id,
+			})
+		}
+
 		return buildCheckoutResponse(completedRecord, input.origin)
 	}
 
@@ -81,6 +98,16 @@ export class CheckoutSessionDurableObject extends DurableObject<Env> {
 		const canceledRecord = cancelCheckoutRecord(record)
 		await this.saveRecord(canceledRecord)
 		return buildCheckoutResponse(canceledRecord, origin)
+	}
+
+	async storeOrderReference(ref: OrderReference): Promise<void> {
+		await this.ctx.storage.put(ORDER_REF_STORAGE_KEY, ref)
+	}
+
+	async getOrderReference(): Promise<OrderReference | null> {
+		const ref =
+			await this.ctx.storage.get<OrderReference>(ORDER_REF_STORAGE_KEY)
+		return ref ?? null
 	}
 
 	private async loadRecord(): Promise<CheckoutSessionRecord | null> {
