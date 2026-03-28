@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>MPP + MCP demo | ACP Peptide Pharmacy</title>
+		<meta
+			name="description"
+			content="How Machine Payments Protocol gates MCP on this demo Worker (Stripe test mode)."
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="./css/styles.css" />
+	</head>
+	<body data-page="mpp">
+		<div class="page-shell">
+			<header class="site-header">
+				<a class="brandmark" href="./index.html">
+					<span class="brandmark__eyebrow">Protocol demo</span>
+					<span class="brandmark__title">MPP on MCP</span>
+				</a>
+				<nav class="site-nav">
+					<a href="./index.html">Storefront</a>
+					<a href="https://mpp.dev/" target="_blank" rel="noopener">mpp.dev</a>
+				</nav>
+			</header>
+
+			<main>
+				<section class="hero">
+					<div class="hero__content">
+						<div class="section-kicker">Stripe test mode · optional gate</div>
+						<h1 class="hero__title">Pay per MCP request</h1>
+						<p class="hero__lede">
+							This storefront’s Worker can require
+							<strong>Machine Payments Protocol</strong> settlement on
+							<code>POST /mcp</code> before AI tools run. Catalog and ACP REST
+							endpoints stay free unless you extend the policy.
+						</p>
+					</div>
+				</section>
+
+				<section class="panel-section" id="flow">
+					<div class="section-heading">
+						<h2>402 challenge flow</h2>
+						<p class="section-sub">
+							Aligned with
+							<a href="https://mpp.dev/protocol" target="_blank" rel="noopener"
+								>mpp.dev/protocol</a
+							>
+							and Stripe SPT charges via
+							<a
+								href="https://docs.stripe.com/payments/machine/mpp"
+								target="_blank"
+								rel="noopener"
+								>Stripe MPP</a
+							>.
+						</p>
+					</div>
+					<ol class="protocol-list">
+						<li>Client <code>POST /mcp</code> without payment → <strong>402</strong> + <code>WWW-Authenticate: Payment</code>.</li>
+						<li>Client completes Stripe <strong>test mode</strong> payment and builds the credential.</li>
+						<li>Client retries with <code>Authorization: Payment …</code> → MCP runs; response may include <code>Payment-Receipt</code>.</li>
+					</ol>
+				</section>
+
+				<section class="panel-section" id="links">
+					<div class="section-heading">
+						<h2>Endpoints</h2>
+					</div>
+					<ul class="protocol-list">
+						<li>
+							<strong>Worker root</strong> —
+							<a id="worker-link" href="#">API index JSON</a>
+						</li>
+						<li>
+							<strong>MCP</strong> — <code>/mcp</code> (Streamable HTTP)
+						</li>
+					</ul>
+				</section>
+			</main>
+
+			<footer class="site-footer">
+				<p>Research-use-only demo. No medical claims.</p>
+			</footer>
+		</div>
+		<script src="./js/config.js"></script>
+		<script>
+			const root = document.getElementById('worker-link')
+			const base = window.ACP_CONFIG?.apiBaseUrl
+			if (root && base) {
+				root.href = base.replace(/\/$/, '') + '/'
+			}
+		</script>
+	</body>
+</html>
