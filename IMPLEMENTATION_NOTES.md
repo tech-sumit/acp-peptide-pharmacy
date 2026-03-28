@@ -14,6 +14,7 @@
 ## Test-only
 
 - Stripe **test** secret keys only (`sk_test_...`). Live keys are rejected at runtime.
+- **Production** deploy uses the same policy: MPP is a demo of machine payments with **Stripe test mode only**, not live card charges.
 
 ## Challenge binding
 

@@ -21,11 +21,12 @@ Live references:
 
 This Worker integrates [MPP](https://mpp.dev/) using Stripe **shared payment tokens (SPTs)** via the official [`mppx`](https://www.npmjs.com/package/mppx) server middleware, following [Stripe’s MPP guide](https://docs.stripe.com/payments/machine/mpp).
 
-### Test mode only
+### Test mode only (including production Worker)
 
-- Use a Stripe **test** secret key (`sk_test_...`). **Live keys (`sk_live_...`) are rejected.**
+- The **deployed** Worker follows the same rules as local dev: **only Stripe test keys** (`sk_test_...`). **Live keys (`sk_live_...`) are rejected** — there are **no real card charges** on the public demo; MPP is a **concept demo** using Stripe test mode.
 - All MPP charges in this demo are **sandbox** amounts (currently **$0.01 USD** per paid **`tools/call`** request).
 - ACP checkout remains a **simulated** merchant flow (demo tokens), separate from MPP access fees.
+- **`GET /`** and **`GET /health`** include `mpp_demo_billing` (and unpaid **`tools/call`** responses include `x-mpp-stripe-mode: test`) so clients can see that billing is test-only.
 
 ### When MPP is active
 

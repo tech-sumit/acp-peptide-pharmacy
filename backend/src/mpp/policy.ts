@@ -35,3 +35,22 @@ export function isMppEnabled(env: Env): boolean {
 	}
 	return Boolean(env.MPP_SECRET_KEY?.trim())
 }
+
+/**
+ * Public metadata for HTTP discovery. Deployed production is a concept demo:
+ * MPP never uses live Stripe — only test keys are accepted.
+ */
+export function mppDemoBillingMeta(env: Env): {
+	mpp_enabled: boolean
+	stripe_billing_mode: 'test_only'
+	live_stripe_keys_rejected: true
+	summary: string
+} {
+	return {
+		mpp_enabled: isMppEnabled(env),
+		stripe_billing_mode: 'test_only',
+		live_stripe_keys_rejected: true,
+		summary:
+			'MPP uses Stripe test mode only (e.g. $0.01 demo charges). sk_live_ keys are rejected; no real-money card charges on this Worker.',
+	}
+}
