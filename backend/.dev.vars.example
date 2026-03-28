@@ -1,0 +1,6 @@
+# Copy to .dev.vars (gitignored) for `wrangler dev`.
+# STRIPE_SECRET_KEY: from Stripe Dashboard (test) or `stripe config --list` after `stripe login`.
+# MPP_SECRET_KEY: openssl rand -base64 32  (must match Worker secret if you test against deployed MPP)
+
+STRIPE_SECRET_KEY=sk_test_your_key_here
+MPP_SECRET_KEY=your_base64_32_byte_secret_here
