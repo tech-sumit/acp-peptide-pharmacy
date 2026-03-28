@@ -37,7 +37,36 @@
 		"enabled": true,
 		"head_sampling_rate": 1
 	},
-	"upload_source_maps": true
+	"upload_source_maps": true,
+	"env": {
+		"test": {
+			"vars": {
+				"MPP_DISABLED": "true"
+			},
+			"durable_objects": {
+				"bindings": [
+					{
+						"name": "CHECKOUT_SESSIONS",
+						"class_name": "CheckoutSessionDurableObject"
+					},
+					{
+						"name": "RATE_LIMITER",
+						"class_name": "RateLimitDurableObject"
+					}
+				]
+			},
+			"migrations": [
+				{
+					"tag": "v1",
+					"new_sqlite_classes": ["CheckoutSessionDurableObject"]
+				},
+				{
+					"tag": "v2",
+					"new_sqlite_classes": ["RateLimitDurableObject"]
+				}
+			]
+		}
+	}
 	/**
 	 * Smart Placement
 	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

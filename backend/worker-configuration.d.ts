@@ -13,6 +13,8 @@ declare namespace Cloudflare {
 		STRIPE_SECRET_KEY?: string;
 		/** Base64 secret for MPP challenge binding (see README). Required when STRIPE_SECRET_KEY is set. */
 		MPP_SECRET_KEY?: string;
+		/** Set to "true" in the `test` Wrangler env so Vitest skips MPP (avoids .dev.vars breaking MCP tests). */
+		MPP_DISABLED?: string;
 	}
 }
 interface Env extends Cloudflare.Env {}

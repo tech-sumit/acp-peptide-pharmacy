@@ -41,6 +41,10 @@ export async function runMppGate(
 	request: Request,
 	env: Env,
 ): Promise<MppGateResult> {
+	if (env.MPP_DISABLED === 'true') {
+		return { kind: 'passthrough' }
+	}
+
 	const keyError = stripeKeyValidationError(env.STRIPE_SECRET_KEY)
 	if (keyError) {
 		return {
