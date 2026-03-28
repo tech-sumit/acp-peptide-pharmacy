@@ -6,7 +6,7 @@
 		<title>ACP Peptide Pharmacy</title>
 		<meta
 			name="description"
-			content="A clinical-luxury peptide storefront demonstrating ACP checkout and MCP ordering for AI agents."
+			content="Clinical-luxury peptide storefront: ACP checkout, MCP tools, and optional MPP (Stripe test mode) on paid MCP tool calls—same Cloudflare Worker backend."
 		/>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -28,6 +28,7 @@
 				<nav class="site-nav">
 					<a href="#catalog">Catalog</a>
 					<a href="#protocol-stack">Protocol Stack</a>
+					<a href="./mpp-demo.html">MPP</a>
 					<a href="./cart.html" class="nav-cart"
 						>Cart <span data-cart-count>0</span></a
 					>
@@ -45,7 +46,8 @@
 						<p class="hero__lede">
 							A polished demo storefront showing how ACP checkout sessions and
 							MCP tools can power the same ordering flow for people and AI
-							agents.
+							agents—with optional Machine Payments Protocol on paid MCP tool
+							calls (Stripe test mode only).
 						</p>
 						<div class="hero__actions">
 							<a class="button button--primary" href="#catalog"
@@ -59,6 +61,7 @@
 							<li>Cloudflare Workers backend</li>
 							<li>GitHub Pages frontend</li>
 							<li>MCP tools for Claude and Cursor</li>
+							<li>MPP on <code>tools/call</code> (test mode)</li>
 						</ul>
 					</div>
 					<div class="hero__panel assay-panel">
@@ -76,12 +79,23 @@
 								<p>Agent-facing tools mapped to the same commerce backend.</p>
 							</article>
 							<article>
+								<h2>MPP</h2>
+								<p>
+									Optional HTTP 402 gate on paid <code>tools/call</code>
+									(Stripe test only). Handshake and <code>tools/list</code> stay
+									free—see <a href="./mpp-demo.html">MPP overview</a>.
+								</p>
+							</article>
+							<article>
 								<h2>Research only</h2>
 								<p>Every product is clearly labeled for demo compliance.</p>
 							</article>
 						</div>
 						<div class="assay-panel__footer">
-							<p>Use the same backend from the web UI or through AI clients.</p>
+							<p>
+								Use the same backend from the web UI or through AI clients.
+								ACP checkout here is separate from MCP access billing.
+							</p>
 						</div>
 					</div>
 				</section>
@@ -112,7 +126,7 @@
 							Claude Desktop, Cursor, and any MCP-compatible client.
 						</p>
 					</div>
-					<div class="stack-grid">
+					<div class="stack-grid stack-grid--protocol" id="mpp">
 						<article class="stack-card">
 							<h3>1. Product discovery</h3>
 							<p>
@@ -123,15 +137,26 @@
 						<article class="stack-card">
 							<h3>2. ACP checkout</h3>
 							<p>
-								Checkout sessions store cart state, shipping, totals, and demo
-								payment completion in Cloudflare Durable Objects.
+								Merchant-style checkout: cart, buyer, fulfillment, and demo
+								payment completion over REST—no MPP on these routes in this
+								demo.
 							</p>
 						</article>
 						<article class="stack-card">
-							<h3>3. Agent ordering</h3>
+							<h3>3. MCP agent ordering</h3>
 							<p>
-								MCP tools wrap the same backend so an assistant can browse,
-								create, update, and complete peptide orders.
+								The same lifecycle is available through MCP tools (create /
+								update / complete checkout). In production, each
+								<code>tools/call</code> may require MPP settlement.
+							</p>
+						</article>
+						<article class="stack-card">
+							<h3>4. MPP access billing</h3>
+							<p>
+								Machine Payments Protocol models <strong>paid access</strong> to
+								the MCP tool surface (catalog queries, order tools, etc.)—separate
+								from ACP’s demo order payment. Stripe <strong>test mode</strong>
+								only; <a href="./mpp-demo.html">full flow</a>.
 							</p>
 						</article>
 					</div>

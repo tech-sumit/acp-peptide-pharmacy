@@ -8,7 +8,10 @@ import type {
 import { handleMcpRequest } from './mcp/server'
 import { runMppGate } from './mpp/gateway'
 import { mcpPostBodyRequiresMppCharge } from './mpp/mcp-methods'
-import { isMppProtectedRequest } from './mpp/policy'
+import {
+	isMppProtectedRequest,
+	mppDemoBillingMeta,
+} from './mpp/policy'
 import {
 	PRODUCT_CATALOG,
 	getProductById,
@@ -22,6 +25,8 @@ const CORS_HEADERS = {
 	'access-control-allow-methods': 'GET,POST,OPTIONS',
 	'access-control-allow-headers':
 		'content-type, authorization, mcp-protocol-version',
+	'access-control-expose-headers':
+		'x-mpp-stripe-mode, x-mpp-demo-billing, x-rate-limit-limit, x-rate-limit-remaining, x-rate-limit-reset',
 }
 
 export default {
@@ -69,7 +74,7 @@ export default {
 						if (gate.kind === 'misconfigured') {
 							mcpResponse = gate.response
 						} else if (gate.kind === 'payment_required') {
-							mcpResponse = gate.response
+							mcpResponse = withMppDemoHeaders(gate.response)
 						} else if (gate.kind === 'ok') {
 							mcpResponse = gate.wrap(
 								await handleMcpRequest(mcpRequest, env),
@@ -90,8 +95,9 @@ export default {
 					name: 'acp-peptide-pharmacy-backend',
 					description:
 						'ACP demo checkout API, MCP tools, and optional MPP (Stripe test mode) on POST /mcp.',
+					mpp_demo_billing: mppDemoBillingMeta(env),
 					mpp:
-						'When STRIPE_SECRET_KEY (sk_test_...) and MPP_SECRET_KEY are set, paid MCP JSON-RPC (e.g. tools/call) returns HTTP 402 until MPP payment; handshake methods like initialize and tools/list stay free. See README.',
+						'When STRIPE_SECRET_KEY (sk_test_...) and MPP_SECRET_KEY are set, paid MCP JSON-RPC (e.g. tools/call) returns HTTP 402 until MPP payment; handshake methods like initialize and tools/list stay free. Production deploy is test-mode-only (no sk_live_). See README.',
 					endpoints: [
 						'GET /health',
 						'GET /products',
@@ -109,11 +115,16 @@ export default {
 			}
 
 			if (request.method === 'GET' && url.pathname === '/health') {
-				return jsonResponse({
-					ok: true,
-					service: 'acp-peptide-pharmacy-backend',
-					version: '0.1.0',
-				}, 200, rateLimitHeaders)
+				return jsonResponse(
+					{
+						ok: true,
+						service: 'acp-peptide-pharmacy-backend',
+						version: '0.1.0',
+						mpp_demo_billing: mppDemoBillingMeta(env),
+					},
+					200,
+					rateLimitHeaders,
+				)
 			}
 
 			if (request.method === 'GET' && url.pathname === '/products') {
@@ -304,6 +315,18 @@ function notFoundResponse(
 		404,
 		additionalHeaders,
 	)
+}
+
+/** 402 MPP challenges are always Stripe test-mode demo charges, never live. */
+function withMppDemoHeaders(response: Response): Response {
+	const headers = new Headers(response.headers)
+	headers.set('x-mpp-stripe-mode', 'test')
+	headers.set('x-mpp-demo-billing', 'stripe-test-only-no-live-charges')
+	return new Response(response.body, {
+		status: response.status,
+		statusText: response.statusText,
+		headers,
+	})
 }
 
 function responseWithHeaders(

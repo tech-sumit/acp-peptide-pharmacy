@@ -25,6 +25,8 @@
 				</a>
 				<nav class="site-nav">
 					<a href="./index.html">Storefront</a>
+					<a href="./index.html#protocol-stack">Protocol stack</a>
+					<a href="./index.html#mpp">MPP on home</a>
 					<a href="https://mpp.dev/" target="_blank" rel="noopener">mpp.dev</a>
 				</nav>
 			</header>
@@ -61,7 +63,17 @@
 						</p>
 					</div>
 					<ol class="protocol-list">
-						<li>Client <code>POST /mcp</code> without payment → <strong>402</strong> + <code>WWW-Authenticate: Payment</code>.</li>
+						<li>
+							<strong>Handshake exempt</strong> — <code>initialize</code>,
+							<code>notifications/*</code>, <code>tools/list</code>, and related
+							discovery methods do not require payment so Streamable HTTP clients
+							(Cursor, <code>mcp-remote</code>) can connect.
+						</li>
+						<li>
+							<strong>Paid tool calls</strong> — <code>tools/call</code> (and other
+							non-exempt JSON-RPC methods) without a credential →
+							<strong>402</strong> + <code>WWW-Authenticate: Payment</code>.
+						</li>
 						<li>Client completes Stripe <strong>test mode</strong> payment and builds the credential.</li>
 						<li>Client retries with <code>Authorization: Payment …</code> → MCP runs; response may include <code>Payment-Receipt</code>.</li>
 					</ol>
