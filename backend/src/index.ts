@@ -6,6 +6,8 @@ import type {
 	UpdateCheckoutRequest,
 } from './acp/types'
 import { handleMcpRequest } from './mcp/server'
+import { runMppGate } from './mpp/gateway'
+import { isMppProtectedRequest } from './mpp/policy'
 import {
 	PRODUCT_CATALOG,
 	getProductById,
@@ -48,24 +50,41 @@ export default {
 			}
 
 			if (url.pathname === '/mcp') {
-				return responseWithHeaders(
-					await handleMcpRequest(request, env),
-					rateLimitHeaders,
-				)
+				let mcpResponse: Response
+				if (isMppProtectedRequest(url, request.method)) {
+					const gate = await runMppGate(request, env)
+					if (gate.kind === 'misconfigured') {
+						mcpResponse = gate.response
+					} else if (gate.kind === 'payment_required') {
+						mcpResponse = gate.response
+					} else if (gate.kind === 'ok') {
+						mcpResponse = gate.wrap(
+							await handleMcpRequest(request, env),
+						)
+					} else {
+						mcpResponse = await handleMcpRequest(request, env)
+					}
+				} else {
+					mcpResponse = await handleMcpRequest(request, env)
+				}
+
+				return responseWithHeaders(mcpResponse, rateLimitHeaders)
 			}
 
 			if (request.method === 'GET' && url.pathname === '/') {
 				return jsonResponse({
 					name: 'acp-peptide-pharmacy-backend',
 					description:
-						'ACP demo checkout API and companion MCP backend for peptide ordering workflows.',
+						'ACP demo checkout API, MCP tools, and optional MPP (Stripe test mode) on POST /mcp.',
+					mpp:
+						'When STRIPE_SECRET_KEY (sk_test_...) and MPP_SECRET_KEY are set, POST /mcp requires HTTP 402 Payment (Machine Payments Protocol) before tool calls. See README.',
 					endpoints: [
 						'GET /health',
 						'GET /products',
 						'GET /products/search?q=',
 						'GET /products/:id',
 					'GET /orders/:id',
-					'ALL /mcp',
+					'ALL /mcp (MPP: POST only when configured)',
 					'POST /checkout_sessions',
 						'GET /checkout_sessions/:id',
 						'POST /checkout_sessions/:id',

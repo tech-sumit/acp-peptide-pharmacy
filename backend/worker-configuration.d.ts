@@ -9,6 +9,10 @@ declare namespace Cloudflare {
 	interface Env {
 		CHECKOUT_SESSIONS: DurableObjectNamespace<import("./src/index").CheckoutSessionDurableObject>;
 		RATE_LIMITER: DurableObjectNamespace<import("./src/index").RateLimitDurableObject>;
+		/** Stripe test-mode secret (`sk_test_...`) for MPP / mppx SPT verification. Optional: omit to disable MPP. */
+		STRIPE_SECRET_KEY?: string;
+		/** Base64 secret for MPP challenge binding (see README). Required when STRIPE_SECRET_KEY is set. */
+		MPP_SECRET_KEY?: string;
 	}
 }
 interface Env extends Cloudflare.Env {}
