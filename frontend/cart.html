@@ -27,6 +27,7 @@
 				</a>
 				<nav class="site-nav">
 					<a href="./index.html#catalog">Catalog</a>
+					<a href="./mpp-demo.html">MPP</a>
 					<a href="./cart.html" class="nav-cart nav-cart--active"
 						>Cart <span data-cart-count>0</span></a
 					>
@@ -41,7 +42,11 @@
 					</div>
 					<p>
 						This checkout uses the same backend state that the MCP tools use.
-						No real payment is processed.
+						No real payment is processed. This path is <strong>ACP over REST</strong>
+						only—when the Worker has MPP secrets enabled, placing the same order via
+						<strong>MCP <code>tools/call</code></strong> in production can require a
+						separate Stripe <strong>test mode</strong> micropayment per tool call.
+						See the <a href="./mpp-demo.html">MPP overview</a>.
 					</p>
 				</section>
 

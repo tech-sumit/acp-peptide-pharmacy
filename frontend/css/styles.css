@@ -259,8 +259,15 @@ button {
 
 .assay-metrics {
 	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: 18px;
 	margin: 26px 0;
+}
+
+@media (max-width: 520px) {
+	.assay-metrics {
+		grid-template-columns: 1fr;
+	}
 }
 
 .assay-metrics article {
@@ -348,6 +355,10 @@ button {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: 18px;
+}
+
+.protocol-stack .stack-grid--protocol {
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
 .product-card,
@@ -680,6 +691,10 @@ input {
 	.product-grid,
 	.stack-grid,
 	.detail-card__specs {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.protocol-stack .stack-grid--protocol {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
