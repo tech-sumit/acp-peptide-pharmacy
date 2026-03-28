@@ -3,7 +3,7 @@ import type { RateLimitDecision } from './rate-limit-do'
 const RATE_LIMIT_WINDOW_MS = 60_000
 const READ_RATE_LIMIT = 60
 const CHECKOUT_WRITE_RATE_LIMIT = 15
-const MCP_RATE_LIMIT = 30
+const MCP_RATE_LIMIT = 180
 
 type RateLimitBucket = 'catalog-read' | 'checkout-write' | 'mcp'
 

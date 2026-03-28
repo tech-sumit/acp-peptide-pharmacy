@@ -7,6 +7,7 @@ import type {
 } from './acp/types'
 import { handleMcpRequest } from './mcp/server'
 import { runMppGate } from './mpp/gateway'
+import { mcpPostBodyRequiresMppCharge } from './mpp/mcp-methods'
 import { isMppProtectedRequest } from './mpp/policy'
 import {
 	PRODUCT_CATALOG,
@@ -52,17 +53,30 @@ export default {
 			if (url.pathname === '/mcp') {
 				let mcpResponse: Response
 				if (isMppProtectedRequest(url, request.method)) {
-					const gate = await runMppGate(request, env)
-					if (gate.kind === 'misconfigured') {
-						mcpResponse = gate.response
-					} else if (gate.kind === 'payment_required') {
-						mcpResponse = gate.response
-					} else if (gate.kind === 'ok') {
-						mcpResponse = gate.wrap(
-							await handleMcpRequest(request, env),
-						)
+					const bodyText = await request.text()
+					const mcpHeaders = new Headers(request.headers)
+					mcpHeaders.delete('content-length')
+					const mcpRequest = new Request(request.url, {
+						method: request.method,
+						headers: mcpHeaders,
+						body: bodyText,
+					})
+					const chargeMpp = mcpPostBodyRequiresMppCharge(bodyText)
+					if (!chargeMpp) {
+						mcpResponse = await handleMcpRequest(mcpRequest, env)
 					} else {
-						mcpResponse = await handleMcpRequest(request, env)
+						const gate = await runMppGate(mcpRequest, env)
+						if (gate.kind === 'misconfigured') {
+							mcpResponse = gate.response
+						} else if (gate.kind === 'payment_required') {
+							mcpResponse = gate.response
+						} else if (gate.kind === 'ok') {
+							mcpResponse = gate.wrap(
+								await handleMcpRequest(mcpRequest, env),
+							)
+						} else {
+							mcpResponse = await handleMcpRequest(mcpRequest, env)
+						}
 					}
 				} else {
 					mcpResponse = await handleMcpRequest(request, env)
@@ -77,7 +91,7 @@ export default {
 					description:
 						'ACP demo checkout API, MCP tools, and optional MPP (Stripe test mode) on POST /mcp.',
 					mpp:
-						'When STRIPE_SECRET_KEY (sk_test_...) and MPP_SECRET_KEY are set, POST /mcp requires HTTP 402 Payment (Machine Payments Protocol) before tool calls. See README.',
+						'When STRIPE_SECRET_KEY (sk_test_...) and MPP_SECRET_KEY are set, paid MCP JSON-RPC (e.g. tools/call) returns HTTP 402 until MPP payment; handshake methods like initialize and tools/list stay free. See README.',
 					endpoints: [
 						'GET /health',
 						'GET /products',
